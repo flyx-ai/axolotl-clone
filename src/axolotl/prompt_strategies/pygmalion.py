@@ -33,19 +33,19 @@ class PygmalionPromptTokenizingStrategy(PromptTokenizingStrategy):
         for _, part in enumerate(self.prompter.build_prompt(prompt["conversations"])):
             role, message = part
             if role == "system":
-                prefix = "<|system|>"
+                prefix = "Amora's"
                 # this should include a bos token, no eos token, strip trailing "\n<START>"
                 if message.endswith("\n<START>"):
                     message = message[:-8]
                 res = self._tokenize(
-                    prefix + "Persona: " + message.strip(),
+                    prefix + " Persona: " + message.strip(),
                     add_eos_token=False,
                     strip_bos_token=False,
                 )
                 # everything from this is masked out from the labels
                 labels = [IGNORE_TOKEN_ID] * len(res["input_ids"])
             elif role == "human":
-                prefix = "<|user|>"
+                prefix = "You:"
                 res = self._tokenize(
                     prefix + " " + message.strip(),
                     add_eos_token=False,
@@ -54,7 +54,7 @@ class PygmalionPromptTokenizingStrategy(PromptTokenizingStrategy):
                 # everything from this is masked out from the labels
                 labels = [IGNORE_TOKEN_ID] * len(res["input_ids"])
             elif role == "bot":
-                prefix = "<|model|>"
+                prefix = "Amora:"
                 res = self._tokenize(
                     prefix + " " + message.strip(),
                     add_eos_token=True,
