@@ -25,7 +25,7 @@ class PygmalionPromptTokenizingStrategy(PromptTokenizingStrategy):
 
     def __init__(self, prompter, tokenizer, *args, **kwargs):
         super().__init__(prompter, tokenizer, *args, **kwargs)
-        res = self._tokenize("<|model|>", add_eos_token=False, strip_bos_token=True)
+        res = self._tokenize("Amora:", add_eos_token=False, strip_bos_token=True)
         self.bot_prefix_token_ids = res["input_ids"]
 
     def tokenize_prompt(self, prompt):
@@ -45,7 +45,7 @@ class PygmalionPromptTokenizingStrategy(PromptTokenizingStrategy):
                 # everything from this is masked out from the labels
                 labels = [IGNORE_TOKEN_ID] * len(res["input_ids"])
             elif role == "human":
-                prefix = "You:"
+                prefix = "\nYou:"
                 res = self._tokenize(
                     prefix + " " + message.strip(),
                     add_eos_token=False,
@@ -54,7 +54,7 @@ class PygmalionPromptTokenizingStrategy(PromptTokenizingStrategy):
                 # everything from this is masked out from the labels
                 labels = [IGNORE_TOKEN_ID] * len(res["input_ids"])
             elif role == "bot":
-                prefix = "Amora:"
+                prefix = "\nAmora:"
                 res = self._tokenize(
                     prefix + " " + message.strip(),
                     add_eos_token=True,
@@ -68,7 +68,6 @@ class PygmalionPromptTokenizingStrategy(PromptTokenizingStrategy):
             else:
                 LOG.warning(f"unknown role in conversation: {role}")
                 res = defaultdict(lambda: [])
-
             # pylint: disable=duplicate-code
             result, current_len = parse_tokenized_to_result(
                 result,
