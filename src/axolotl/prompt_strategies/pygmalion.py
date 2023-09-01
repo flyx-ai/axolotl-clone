@@ -35,12 +35,12 @@ class PygmalionPromptTokenizingStrategy(PromptTokenizingStrategy):
             if role == "system":
                 prefix = "Amora's"
                 # this should include a bos token, no eos token, strip trailing "\n<START>"
-                if message.endswith("\n<START>"):
-                    message = message[:-8]
+                # if message.endswith("\n<START>"):
+                #     message = message[:-8]
                 res = self._tokenize(
                     prefix + " Persona: " + message.strip(),
                     add_eos_token=False,
-                    strip_bos_token=False,
+                    strip_bos_token=True,
                 )
                 # everything from this is masked out from the labels
                 labels = [IGNORE_TOKEN_ID] * len(res["input_ids"])
@@ -57,7 +57,7 @@ class PygmalionPromptTokenizingStrategy(PromptTokenizingStrategy):
                 prefix = "\nAmora:"
                 res = self._tokenize(
                     prefix + " " + message.strip(),
-                    add_eos_token=True,
+                    add_eos_token=False,
                     strip_bos_token=True,
                 )
                 # mask out the prefix token, rest is not masked out from labels
@@ -68,6 +68,7 @@ class PygmalionPromptTokenizingStrategy(PromptTokenizingStrategy):
             else:
                 LOG.warning(f"unknown role in conversation: {role}")
                 res = defaultdict(lambda: [])
+
             # pylint: disable=duplicate-code
             result, current_len = parse_tokenized_to_result(
                 result,
