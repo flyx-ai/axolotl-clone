@@ -361,7 +361,7 @@ def add_position_ids(sample):
 
 
 def drop_long_seq(sample, sequence_len=2048):
-    return len(sample["input_ids"]) <= sequence_len
+    return len(sample["input_ids"]) <= sequence_len and len(sample["input_ids"]) > 0
 
 
 @contextmanager
@@ -400,6 +400,16 @@ def calculate_total_num_steps(cfg, train_dataset, tokenizer):
             )
             LOG.info(f"📝 UPDATE CONFIG WITH: `total_num_tokens: {total_num_tokens}`")
             cfg.total_num_tokens = total_num_tokens
+
+        if not cfg.total_supervised_tokens:
+            total_supervised_tokens = (
+                train_dataset.data.column("labels")
+                .to_pandas()
+                .apply(lambda x: np.sum(np.array(x) != -100))
+                .sum()
+            )
+            LOG.info(f"`total_supervised_tokens: {total_supervised_tokens}`")
+            cfg.total_supervised_tokens = total_supervised_tokens
 
         if cfg.sample_packing_eff_est:
             total_num_steps = (
@@ -578,6 +588,15 @@ def setup_trainer(cfg, train_dataset, eval_dataset, model, tokenizer, total_num_
         training_arguments_kwargs["do_bench_eval"] = cfg.do_bench_eval
         if cfg.bench_dataset:
             training_arguments_kwargs["bench_dataset"] = cfg.bench_dataset
+
+    # DDP Config
+    if cfg.ddp_timeout:
+        training_arguments_kwargs["ddp_timeout"] = cfg.ddp_timeout
+    # see https://pytorch.org/docs/stable/generated/torch.nn.parallel.DistributedDataParallel.html
+    if cfg.ddp_bucket_cap_mb:
+        training_arguments_kwargs["ddp_bucket_cap_mb"] = cfg.ddp_bucket_cap_mb
+    if cfg.ddp_broadcast_buffers is not None:
+        training_arguments_kwargs["ddp_broadcast_buffers"] = cfg.ddp_broadcast_buffers
 
     training_args = AxolotlTrainingArguments(  # pylint: disable=unexpected-keyword-arg
         max_steps=total_num_steps if cfg.max_steps else -1,
