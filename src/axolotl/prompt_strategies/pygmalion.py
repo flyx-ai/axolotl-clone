@@ -78,8 +78,10 @@ class PygmalionPromptTokenizingStrategy(PromptTokenizingStrategy):
                 pad_token_id=self.tokenizer.pad_token_id,
             )
             LOG.debug("--------------------------------")
-            LOG.debug(f"res: {res}")
-            LOG.debug(f"result: {result}")
+            # LOG.debug(f"res: {res}")
+            decoded_text = self.tokenizer.decode(res["input_ids"])
+            LOG.debug(f"Decoded text: {decoded_text}")
+            # LOG.debug(f"result: {result}")
             LOG.debug("--------------------------------")
         return result
 
