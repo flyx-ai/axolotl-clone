@@ -163,3 +163,7 @@ cython_debug/
 .idea/
 
 last_run_prepared/
+# result of the amora pyg training
+amora-pyg/
+# wandb logs
+wandb/
