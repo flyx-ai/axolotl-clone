@@ -238,10 +238,13 @@ def load_datasets(
     cfg: DictDefault,
     cli_args: TrainerCliArgs,
 ) -> TrainDatasetMeta:
+    LOG.info('---loading tokenizer---')
     tokenizer = load_tokenizer(cfg)
-
+    LOG.info('---loading dataset---')
+    print("about to go into prepare_dataset###########")
+    print("this is where logs start disppearing")
     train_dataset, eval_dataset, total_num_steps = prepare_dataset(cfg, tokenizer)
-
+    print("done with prepare_dataset###########")
     if cli_args.debug or cfg.debug:
         LOG.info("check_dataset_labels...")
         check_dataset_labels(
@@ -264,6 +267,7 @@ def load_datasets(
 
 
 def do_cli(config: Path = Path("examples/"), **kwargs):
+    LOG.info("Starting Axolotl, hello!!!!!!!--------------")
     print_axolotl_text_art()
     parsed_cfg = load_cfg(config, **kwargs)
     parser = transformers.HfArgumentParser((TrainerCliArgs))
@@ -271,12 +275,20 @@ def do_cli(config: Path = Path("examples/"), **kwargs):
         return_remaining_strings=True
     )
     if parsed_cli_args.inference:
+        LOG.info('1----')
+        
         do_inference(cfg=parsed_cfg, cli_args=parsed_cli_args)
     elif parsed_cli_args.merge_lora:
+        LOG.info('2----')
+        
         do_merge_lora(cfg=parsed_cfg, cli_args=parsed_cli_args)
     elif parsed_cli_args.shard:
+        LOG.info('3----')
         shard(cfg=parsed_cfg, cli_args=parsed_cli_args)
     else:
+        LOG.info('4----')
+        print("i am a retard###################")
+        
         dataset_meta = load_datasets(cfg=parsed_cfg, cli_args=parsed_cli_args)
         if parsed_cli_args.prepare_ds_only:
             return

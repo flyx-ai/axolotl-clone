@@ -48,11 +48,16 @@ from axolotl.utils.trainer import (
     process_datasets_for_packing,
 )
 
-LOG = logging.getLogger("axolotl")
+# LOG = logging.getLogger("axolotl.utils.data")
+LOG = logging.getLogger("retardation")
 DEFAULT_DATASET_PREPARED_PATH = "last_run_prepared"
 
 
 def prepare_dataset(cfg, tokenizer):
+    LOG.info('------prepare dataset------------')
+    print('------prepare dataset------------')
+    
+    ### this is where the logs begin to disappear
     if not cfg.pretraining_dataset:
         with zero_first(is_main_process()):
             train_dataset, eval_dataset = load_prepare_datasets(
@@ -118,14 +123,18 @@ def load_tokenized_prepared_datasets(
         pass
 
     if dataset:
+        LOG.info("dataset loaded from hub...------")
         ...
     elif any(prepared_ds_path.glob("*")):
-        LOG.info(f"Loading prepared dataset from disk at {prepared_ds_path}...")
+        LOG.info("yuooooooooooooooo----------------------")
+        print("--------------hello------------------Loading prepared dataset from disk at")
+        LOG.info(f"Loading prepared dataset from disk at {prepared_ds_path}...------------")
         dataset = load_from_disk(str(prepared_ds_path))
         LOG.info("Prepared dataset loaded from disk...")
     else:
         LOG.info(f"Unable to find prepared dataset in {prepared_ds_path}")
-        LOG.info("Loading raw datasets...")
+        LOG.info("Loading raw datasets... yyooooooooo")
+        LOG.info("yuooooooooooooooo----------------------")
 
         if cfg.seed:
             seed = cfg.seed
@@ -145,6 +154,9 @@ def load_tokenized_prepared_datasets(
 
         # pylint: disable=invalid-name
         for d in for_d_in_datasets(cfg.datasets):
+            LOG.debug('----')
+            LOG.debug(f"loading dataset: {d}")
+            LOG.debug('----')
             ds: Union[Dataset, DatasetDict] = None
             ds_from_hub = False
             try:
@@ -219,6 +231,7 @@ def load_tokenized_prepared_datasets(
 
             d_base_type = d_prompt_style = None
             d_type = d.type
+
             if isinstance(d_type, str):
                 d_type_split = d_type.split(":")
                 d_base_type = d_type_split[0]
@@ -237,6 +250,7 @@ def load_tokenized_prepared_datasets(
                 ds_wrapper = TokenizedPromptDataset(ds_strategy, ds)
                 datasets.append(ds_wrapper)
             elif ds_strategy := load(d.type, tokenizer, cfg, d):
+                # pyg should go here
                 ds_wrapper = TokenizedPromptDataset(ds_strategy, ds)
                 datasets.append(ds_wrapper)
             elif d_base_type == "alpaca":
@@ -370,6 +384,7 @@ def load_prepare_datasets(
     )  # make sure we don't accidentally set it larger than sequence_len
 
     tokenizer_name = tokenizer.__class__.__name__
+    LOG.info(f"tokenizer name: {tokenizer_name}----------------")
     if cfg.max_packed_sequence_len is not None:
         # see if we can go ahead and load the stacked dataset
         seed = f"@{str(cfg.seed)}" if cfg.seed else ""

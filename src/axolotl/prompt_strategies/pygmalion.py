@@ -77,6 +77,10 @@ class PygmalionPromptTokenizingStrategy(PromptTokenizingStrategy):
                 labels,
                 pad_token_id=self.tokenizer.pad_token_id,
             )
+            LOG.debug("--------------------------------")
+            LOG.debug(f"res: {res}")
+            LOG.debug(f"result: {result}")
+            LOG.debug("--------------------------------")
         return result
 
 
