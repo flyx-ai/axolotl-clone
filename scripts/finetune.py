@@ -254,12 +254,12 @@ def load_datasets(
     train_dataset, eval_dataset, total_num_steps = prepare_dataset(cfg, tokenizer)
     
     LOG.info("sample text from dataset...\n")
-    LOG.info('------------------------------------')
+    print('------------------------------------')
     try:
         show_sample_txt_from_ds(tokenizer)
     except:
         ...
-    LOG.info('------------------------------------\n\n')
+    print('------------------------------------\n\n')
 
     if cli_args.debug or cfg.debug:
         LOG.info("check_dataset_labels...")
