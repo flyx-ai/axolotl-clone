@@ -399,6 +399,9 @@ tokenizer_legacy:
 # this is reported to improve training speed on some models
 resize_token_embeddings_to_32x:
 
+ # specify the device to use ('cuda' for GPU, 'cpu' for CPU)
+device: cuda
+
 # whether you are training a 4-bit GPTQ quantized model
 gptq: true
 gptq_groupsize: 128 # group size

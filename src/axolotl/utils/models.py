@@ -104,7 +104,6 @@ def load_model(
 
     # TODO refactor as a kwarg
     load_in_8bit = cfg.load_in_8bit
-
     if cfg.is_llama_derived_model and cfg.flash_attention:
         if cfg.device not in ["mps", "cpu"] and not inference:
             from axolotl.monkeypatch.llama_attn_hijack_flash import (
@@ -418,7 +417,14 @@ def load_model(
 
     if cfg.flash_optimum:
         model = BetterTransformer.transform(model)
-
+        
+    # device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    # model.to(device)
+    
+    # make sure this doesn't mess with training
+    if cfg.device is not None:
+        model.to(cfg.device)
+    
     if cfg.adapter is not None:
         log_gpu_memory_usage(LOG, "after adapters", model.device)
 
