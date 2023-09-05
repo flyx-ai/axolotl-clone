@@ -24,7 +24,7 @@ from axolotl.utils.config import normalize_config, validate_config
 from axolotl.utils.data import prepare_dataset
 from axolotl.utils.dict import DictDefault
 from axolotl.utils.distributed import is_main_process
-from axolotl.utils.models import load_tokenizer
+from axolotl.utils.models import load_model_config, load_tokenizer
 from axolotl.utils.tokenization import check_dataset_labels
 from axolotl.utils.wandb import setup_wandb_env_vars
 
@@ -216,6 +216,15 @@ def load_cfg(config: Path = Path("examples/"), **kwargs):
             else:
                 cfg[k] = kwargs[k]
 
+    model_config = load_model_config(cfg)
+
+    # figure out if the model is llama
+    cfg.is_llama_derived_model = (
+        (hasattr(model_config, "model_type") and model_config.model_type == "llama")
+        or cfg.is_llama_derived_model
+        or "llama" in cfg.base_model
+        or (cfg.model_type and "llama" in cfg.model_type.lower())
+    )
     validate_config(cfg)
 
     normalize_config(cfg)
@@ -229,6 +238,8 @@ def show_sample_txt_from_ds(tokenizer, data_set_path="./last_run_prepared/701123
     dataset = Dataset.load_from_disk(data_set_path)
 
     df = dataset.to_pandas()
+    
+    LOG.info(f'# of processing items: {len(df)}')
 
     for row in df.head(2).itertuples():
         decoded_text = tokenizer.decode(row.input_ids)

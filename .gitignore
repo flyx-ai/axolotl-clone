@@ -167,3 +167,4 @@ last_run_prepared/
 amora-pyg/
 # wandb logs
 wandb/
+artifacts/
