@@ -372,19 +372,39 @@ def disable_datasets_caching():
     finally:
         set_caching_enabled(True)
 
+# def truncate_seq(sample, sequence_len=2048):
+#     if len(sample["input_ids"]) > sequence_len:
+#         sample["input_ids"] = sample["input_ids"][:sequence_len]
+#     return sample
 
 def process_datasets_for_packing(cfg, train_dataset, eval_dataset):
+    initial_train_size = len(train_dataset)
+    initial_eval_size = len(eval_dataset) if eval_dataset else 0
+    
+    LOG.info("dropping longer convos")
     drop_long = partial(drop_long_seq, sequence_len=cfg.sequence_len)
     train_dataset = train_dataset.filter(drop_long, num_proc=os.cpu_count())
     if eval_dataset:
         eval_dataset = eval_dataset.filter(drop_long, num_proc=os.cpu_count())
+        
+    final_train_size = len(train_dataset)
+    final_eval_size = len(eval_dataset) if eval_dataset else 0
+    
+    LOG.debug(f"-----Train dataset: {initial_train_size} initial samples, {final_train_size} final samples, {initial_train_size - final_train_size} filtered/truncated.")
+    if eval_dataset:
+        LOG.debug(f"------Eval dataset: {initial_eval_size} initial samples, {final_eval_size} final samples, {initial_eval_size - final_eval_size} filtered/truncated.")
+    
+    # LOG.info("truncating logger convos")
+    # truncate = partial(truncate_seq, sequence_len=cfg.sequence_len)
+    # train_dataset = train_dataset.map(truncate, num_proc=os.cpu_count())
+    # if eval_dataset:
+    #     eval_dataset = eval_dataset.map(truncate, num_proc=os.cpu_count())
 
     if cfg.sample_packing:
         train_dataset = train_dataset.map(add_position_ids, num_proc=os.cpu_count())
         if eval_dataset:
             eval_dataset = eval_dataset.map(add_position_ids, num_proc=os.cpu_count())
     return train_dataset, eval_dataset
-
 
 def calculate_total_num_steps(cfg, train_dataset, tokenizer):
     if cfg.sample_packing:
