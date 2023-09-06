@@ -232,8 +232,11 @@ def load_cfg(config: Path = Path("examples/"), **kwargs):
     setup_wandb_env_vars(cfg)
     return cfg
 
-def show_sample_txt_from_ds(tokenizer, data_set_path="./last_run_prepared/701123de2d8265eb65694b58cc962a1d/"):
+def show_sample_txt_from_ds(tokenizer, data_set_path="./last_run_prepared/27e6fc818d23338c4960d59b2f5fa6c8"):
     from datasets import Dataset
+    
+    LOG.info("sample text from dataset...\n")
+    print('------------------------------------')
     
     dataset = Dataset.load_from_disk(data_set_path)
 
@@ -244,6 +247,7 @@ def show_sample_txt_from_ds(tokenizer, data_set_path="./last_run_prepared/701123
     for row in df.head(2).itertuples():
         decoded_text = tokenizer.decode(row.input_ids)
         print(decoded_text)
+    print('------------------------------------\n\n')
 
 
 def load_datasets(
@@ -255,13 +259,10 @@ def load_datasets(
 
     train_dataset, eval_dataset, total_num_steps = prepare_dataset(cfg, tokenizer)
     
-    LOG.info("sample text from dataset...\n")
-    print('------------------------------------')
     try:
         show_sample_txt_from_ds(tokenizer)
     except:
         ...
-    print('------------------------------------\n\n')
 
     if cli_args.debug or cfg.debug:
         LOG.info("check_dataset_labels...")

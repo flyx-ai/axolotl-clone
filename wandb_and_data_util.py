@@ -17,7 +17,7 @@ def download_artifact():
     
     return artifact_dir
 
-def show_sample_txt_from_ds(data_set_path="./last_run_prepared/701123de2d8265eb65694b58cc962a1d/"):
+def show_sample_txt_from_ds(data_set_path="./last_run_prepared/27e6fc818d23338c4960d59b2f5fa6c8/"):
     from datasets import Dataset
     from transformers import AutoTokenizer
     
