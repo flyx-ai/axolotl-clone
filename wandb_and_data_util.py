@@ -1,6 +1,6 @@
 import wandb
 
-def log_artifact(dir='amora-pyg'):
+def log_artifact(dir='amora-pyg/merged'):
     with wandb.init(project="ATP-1", job_type="update-dataset") as run:
         artifact = wandb.Artifact(name="training_output", type="dataset")
 
@@ -9,7 +9,7 @@ def log_artifact(dir='amora-pyg'):
 
 def download_artifact():
     run = wandb.init(project="ATP-1", job_type="download-dataset", tags=["latest"])
-    artifact = run.use_artifact("training_output:v0")
+    artifact = run.use_artifact("training_output:latest")
     artifact_dir = artifact.download()
     print(artifact_dir)
 
@@ -35,6 +35,6 @@ def show_sample_txt_from_ds(data_set_path="./last_run_prepared/701123de2d8265eb6
         print(decoded_text)
 
 if __name__ == "__main__":
-    # log_artifact()
+    log_artifact()
     # download_artifact()
-    show_sample_txt_from_ds()
+    # show_sample_txt_from_ds()
