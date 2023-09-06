@@ -40,7 +40,7 @@ class PygmalionPromptTokenizingStrategy(PromptTokenizingStrategy):
                 res = self._tokenize(
                     prefix + " Persona: " + message.strip(),
                     add_eos_token=False,
-                    strip_bos_token=True,
+                    strip_bos_token=False,
                 )
                 # everything from this is masked out from the labels
                 labels = [IGNORE_TOKEN_ID] * len(res["input_ids"])
@@ -57,7 +57,7 @@ class PygmalionPromptTokenizingStrategy(PromptTokenizingStrategy):
                 prefix = "\nAmora:"
                 res = self._tokenize(
                     prefix + " " + message.strip(),
-                    add_eos_token=False,
+                    add_eos_token=True,
                     strip_bos_token=True,
                 )
                 # mask out the prefix token, rest is not masked out from labels
